@@ -1,0 +1,9 @@
+import { PrismaClient, Role } from '@prisma/client'; import bcrypt from 'bcryptjs';
+const db=new PrismaClient();
+const services=[['Instalação e atualização de softwares','Instalação, configuração e atualização de aplicações.',120],['Instalação e atualização de hardwares','Instalação e configuração de componentes.',180],['Diagnóstico e remoção de vírus','Análise e limpeza de ameaças.',150],['Suporte a impressoras','Configuração, drivers e conectividade.',100],['Suporte a periféricos','Configuração de teclado, mouse, webcam e similares.',90],['Conectividade de internet','Diagnóstico de rede, Wi-Fi e DNS.',140],['Backup e recuperação de dados','Rotinas de backup e recuperação.',220],['Otimização do sistema operacional','Ajustes de desempenho e manutenção.',130],['Configuração de VPN e acesso remoto','Configuração segura de acesso remoto.',160]];
+async function main(){const hash=await bcrypt.hash('Admin@123',10); await db.user.upsert({where:{email:'admin@helpdesk.local'},update:{},create:{name:'Administrador',email:'admin@helpdesk.local',password:hash,role:Role.ADMIN}});
+const techs=[['Técnico 1','tecnico1@helpdesk.local',['08:00','09:00','10:00','11:00','14:00','15:00','16:00','17:00']],['Técnico 2','tecnico2@helpdesk.local',['10:00','11:00','12:00','13:00','16:00','17:00','18:00','19:00']],['Técnico 3','tecnico3@helpdesk.local',['12:00','13:00','14:00','15:00','18:00','19:00','20:00','21:00']]];
+for(const [name,email,availability] of techs) await db.user.upsert({where:{email},update:{},create:{name,email,password:hash,role:Role.TECHNICIAN,availability,mustChangePassword:true}});
+for(const [name,description,price] of services) await db.service.upsert({where:{id:`seed-${name}`},update:{},create:{id:`seed-${name}`,name,description,price}}).catch(async()=>{await db.service.create({data:{name,description,price}})});
+console.log('Seed concluído. Senha inicial: Admin@123 / Admin@123 para técnicos.');}
+main().finally(()=>db.$disconnect());

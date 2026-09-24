@@ -1,0 +1,1 @@
+export type User={id:string;name:string;email:string;role:'ADMIN'|'TECHNICIAN'|'CLIENT';imageUrl?:string;mustChangePassword?:boolean}; export const getUser=()=>{try{return JSON.parse(localStorage.getItem('user')||'null') as User|null}catch{return null}}; export const logout=()=>{localStorage.clear();location.href='/login'};
